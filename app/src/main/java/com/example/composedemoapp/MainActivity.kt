@@ -210,7 +210,7 @@ fun OnboardingScreen(onContinueClicked: () -> Unit) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Welcome to the Basics Codelab!")
+            Text("Welcome to jetpack compose app")
             Button(
                 modifier = Modifier.padding(vertical = 24.dp),
                 onClick = onContinueClicked
@@ -232,6 +232,8 @@ fun OnboardingPreview() {
 
 @Composable
 fun Splasher():Boolean {
+    var shouldShowSplasher by rememberSaveable { mutableStateOf(true) }
+    if (!shouldShowSplasher) return false
     val compositionResult : LottieCompositionResult = rememberLottieComposition(
         spec = LottieCompositionSpec.RawRes(R.raw.splash_animation)
     )
@@ -246,7 +248,8 @@ fun Splasher():Boolean {
         composition = compositionResult.value,
         progress = progress
     )
-    return progress != 1.0f
+    shouldShowSplasher = progress != 1.0f
+    return shouldShowSplasher
 
 }
 
