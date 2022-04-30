@@ -72,4 +72,8 @@ dependencies {
 
     def nav_version = "2.4.2"
     implementation("androidx.navigation:navigation-compose:$nav_version")
+    //System UI control
+    implementation "com.google.accompanist:accompanist-systemuicontroller:0.17.0"
+    //Page indicator
+    implementation "com.google.accompanist:accompanist-pager:0.22.0-rc"
 }

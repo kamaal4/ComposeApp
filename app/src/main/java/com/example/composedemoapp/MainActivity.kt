@@ -36,6 +36,8 @@ import androidx.navigation.compose.rememberNavController
 import com.airbnb.lottie.compose.*
 import com.example.composedemoapp.network.Movie
 import com.example.composedemoapp.ui.theme.ComposeDemoAppTheme
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.skydoves.landscapist.glide.GlideImage
 
 class MainActivity : ComponentActivity() {
@@ -51,7 +53,11 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
+                    val systemUiController = rememberSystemUiController()
+                    // hide status bar
+                    systemUiController.isStatusBarVisible = false
                     if (!Splasher()) {
+                        systemUiController.isStatusBarVisible = true
                         MyApp(movieList = mainViewModel.movieListResponse)
                         mainViewModel.getMovieList()
                     }
@@ -65,6 +71,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun MyApp(movieList: List<Movie>) {
 
+    //rememberSaveable helps to keep the app in a same state
     var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
     if (shouldShowOnboarding) {
         OnboardingScreen(onContinueClicked = { shouldShowOnboarding = false })
@@ -75,6 +82,10 @@ private fun MyApp(movieList: List<Movie>) {
 
 @Composable
 private fun Movies(movies: List<Movie>) {
+    /*
+    * Scaffold provide slots for
+    * TopAppBar, BottomAppBar, FloatingActionButton and Drawer.
+    * */
     Scaffold(
         topBar = {
             TopAppBar(
@@ -89,6 +100,7 @@ private fun Movies(movies: List<Movie>) {
             )
         }
     ) { innerPadding ->
+        //LazyColumn works like a recyclerView
         LazyColumn(modifier = Modifier
             .padding(innerPadding)
             .padding(vertical = 4.dp)) {
@@ -128,7 +140,7 @@ private fun CardContent(movie: Movie){
             shape = CircleShape,
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
         ) {
-            //Image goes here
+            //GlideImage will render a image from given url
             GlideImage(
                 imageModel = movie.imageUrl,
                 contentScale = ContentScale.Crop,
