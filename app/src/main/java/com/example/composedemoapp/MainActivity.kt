@@ -9,7 +9,6 @@ import androidx.activity.viewModels
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,23 +17,26 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.twotone.East
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
-import coil.size.Scale
-import coil.transform.CircleCropTransformation
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.rememberNavController
+import com.airbnb.lottie.compose.*
 import com.example.composedemoapp.network.Movie
 import com.example.composedemoapp.ui.theme.ComposeDemoAppTheme
+import com.skydoves.landscapist.glide.GlideImage
 
 class MainActivity : ComponentActivity() {
 
@@ -49,8 +51,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MyApp(movieList = mainViewModel.movieListResponse)
-                    mainViewModel.getMovieList()
+                    if (!Splasher()) {
+                        MyApp(movieList = mainViewModel.movieListResponse)
+                        mainViewModel.getMovieList()
+                    }
                 }
             }
         }
@@ -85,7 +89,8 @@ private fun Movies(movies: List<Movie>) {
             )
         }
     ) { innerPadding ->
-        LazyColumn(modifier = Modifier.padding(innerPadding)
+        LazyColumn(modifier = Modifier
+            .padding(innerPadding)
             .padding(vertical = 4.dp)) {
             items(items = movies) { movie ->
                 MovieItem(movie = movie)
@@ -124,22 +129,16 @@ private fun CardContent(movie: Movie){
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
         ) {
             //Image goes here
-            Image(
-                painter = rememberImagePainter(
-                    data = movie.imageUrl,
-
-                    builder = {
-                        scale(Scale.FILL)
-                        placeholder(R.drawable.ic_launcher_background)
-                        transformations(CircleCropTransformation())
-
-                    }
-                ),
+            GlideImage(
+                imageModel = movie.imageUrl,
+                contentScale = ContentScale.Crop,
+                placeHolder = ImageBitmap.imageResource(com.airbnb.lottie.R.drawable.abc_ic_star_half_black_16dp),
                 contentDescription = movie.desc,
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(0.2f)
             )
+
         }
 
         Column(
@@ -230,4 +229,24 @@ fun OnboardingPreview() {
     }
 }
 
+
+@Composable
+fun Splasher():Boolean {
+    val compositionResult : LottieCompositionResult = rememberLottieComposition(
+        spec = LottieCompositionSpec.RawRes(R.raw.splash_animation)
+    )
+
+    val progress by animateLottieCompositionAsState(
+        composition = compositionResult.value,
+        isPlaying = true,
+        iterations = 1,
+        speed = 1.0f,
+    )
+    LottieAnimation(
+        composition = compositionResult.value,
+        progress = progress
+    )
+    return progress != 1.0f
+
+}
 
